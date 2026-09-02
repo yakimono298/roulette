@@ -64,6 +64,24 @@
       border-bottom: 1px solid rgba(255,255,255,0.5);
     }
 
+    /* ポイントごとの文字色 */
+    .point-0 {
+      color: white;
+    }
+
+    .point-1,
+    .point-2,
+    .point-3,
+    .point-5 {
+      color: #333;
+    }
+
+    .point-10,
+    .point-20,
+    .point-30 {
+      color: white;
+    }
+
     /* 中央の丸 */
     #center {
       position: absolute;
@@ -145,13 +163,47 @@
     /* 結果 */
     #result {
       margin-top: 30px;
-
-      min-height: 60px;
+      min-height: 70px;
 
       font-size: 36px;
       font-weight: bold;
 
       color: #333;
+
+      transition: color 0.3s;
+    }
+
+    /* 結果のポイント色 */
+    #result.result-0 {
+      color: #000000;
+    }
+
+    #result.result-1 {
+      color: #29b6f6;
+    }
+
+    #result.result-2 {
+      color: #43a047;
+    }
+
+    #result.result-3 {
+      color: #fbc02d;
+    }
+
+    #result.result-5 {
+      color: #fb8c00;
+    }
+
+    #result.result-10 {
+      color: #e53935;
+    }
+
+    #result.result-20 {
+      color: #8e24aa;
+    }
+
+    #result.result-30 {
+      color: #d4a017;
     }
 
     /* 小さい画面対応 */
@@ -214,27 +266,18 @@
      * ポイントの設定
      * ============================
      *
-     * 数字をそのまま「マスの数」として使用します。
-     *
-     * 0pt  → 5マス
-     * 1pt  → 9マス
-     * 2pt  → 8マス
-     * 3pt  → 6マス
-     * 5pt  → 5マス
-     * 10pt → 4マス
-     * 20pt → 2マス
-     * 30pt → 1マス
+     * count = そのポイントのマス数
      */
 
     const points = [
-      { point: 0,  count: 5 },
-      { point: 1,  count: 9 },
-      { point: 2,  count: 8 },
-      { point: 3,  count: 6 },
-      { point: 5,  count: 5 },
-      { point: 10, count: 4 },
-      { point: 20, count: 2 },
-      { point: 30, count: 1 }
+      { point: 0,  count: 5, color: "#000000" }, // 黒
+      { point: 1,  count: 9, color: "#29b6f6" }, // 水色
+      { point: 2,  count: 8, color: "#43a047" }, // 緑
+      { point: 3,  count: 6, color: "#fbc02d" }, // 黄色
+      { point: 5,  count: 5, color: "#fb8c00" }, // オレンジ
+      { point: 10, count: 4, color: "#e53935" }, // 赤
+      { point: 20, count: 2, color: "#8e24aa" }, // 紫
+      { point: 30, count: 1, color: "#d4a017" }  // 金
     ];
 
 
@@ -249,48 +292,42 @@
     points.forEach(item => {
 
       for (let i = 0; i < item.count; i++) {
-        slots.push(item.point);
+
+        slots.push({
+          point: item.point,
+          color: item.color
+        });
+
       }
 
     });
 
 
     /*
-     * 色
-     */
-
-    const colors = [
-      "#42a5f5",
-      "#66bb6a",
-      "#ffa726",
-      "#ab47bc",
-      "#ef5350",
-      "#26a69a",
-      "#ec407a",
-      "#7e57c2"
-    ];
-
-
-    /*
+     * ============================
      * ルーレットを作る
+     * ============================
      */
 
-    const roulette = document.getElementById("roulette");
+    const roulette =
+      document.getElementById("roulette");
 
     const total = slots.length;
 
 
-    slots.forEach((point, index) => {
+    slots.forEach((slot, index) => {
 
-      const slice = document.createElement("div");
+      const slice =
+        document.createElement("div");
 
-      slice.className = "slice";
+      slice.className = "slice point-" + slot.point;
 
       /*
        * 1マスあたりの角度
        */
 
       const angle = 360 / total;
+
 
       /*
        * マスを配置
@@ -301,18 +338,19 @@
 
 
       /*
-       * 色
+       * ポイントごとの色
        */
 
       slice.style.backgroundColor =
-        colors[index % colors.length];
+        slot.color;
 
 
       /*
        * ポイント表示
        */
 
-      slice.textContent = point + "pt";
+      slice.textContent =
+        slot.point + "pt";
 
 
       roulette.appendChild(slice);
@@ -326,8 +364,11 @@
      * ============================
      */
 
-    const startBtn = document.getElementById("startBtn");
-    const result = document.getElementById("result");
+    const startBtn =
+      document.getElementById("startBtn");
+
+    const result =
+      document.getElementById("result");
 
     let currentRotation = 0;
 
@@ -340,11 +381,14 @@
 
       startBtn.disabled = true;
 
+
       /*
        * 結果を消す
        */
 
       result.textContent = "";
+
+      result.className = "";
 
 
       /*
@@ -363,10 +407,8 @@
 
 
       /*
-       * 選んだマスを上の矢印に合わせる
-       *
-       * マスの中央が矢印に来るように
-       * 半マス分ずらす。
+       * 選んだマスの中央を
+       * 上の矢印に合わせる
        */
 
       const targetAngle =
@@ -374,7 +416,7 @@
 
 
       /*
-       * 数回転させてから停止
+       * 数回転させる
        */
 
       const extraRotation =
@@ -386,7 +428,8 @@
        */
 
       currentRotation +=
-        extraRotation + (360 - targetAngle);
+        extraRotation +
+        (360 - targetAngle);
 
 
       /*
@@ -398,13 +441,29 @@
 
 
       /*
-       * 回転終了後に結果を表示
+       * 5秒後に結果表示
        */
 
       setTimeout(() => {
 
-        const selectedPoint =
+        /*
+         * 選ばれたマスの情報を取得
+         */
+
+        const selectedSlot =
           slots[selectedIndex];
+
+
+        const selectedPoint =
+          selectedSlot.point;
+
+
+        /*
+         * 結果のポイントと色を連動
+         */
+
+        result.className =
+          "result-" + selectedPoint;
 
 
         result.textContent =
