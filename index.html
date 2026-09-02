@@ -19,31 +19,48 @@
       margin-bottom: 25px;
     }
 
-    /* ルーレット全体 */
+
+    /* =========================
+       ルーレット全体
+       ========================= */
+
     #rouletteWrap {
       position: relative;
+
       width: 360px;
       height: 360px;
+
       margin: 0 auto 25px;
     }
 
-    /* ルーレット本体 */
+
+    /* =========================
+       ルーレット本体
+       ========================= */
+
     #roulette {
       width: 360px;
       height: 360px;
 
       border-radius: 50%;
+
       border: 8px solid #333;
+
       box-sizing: border-box;
 
       position: relative;
+
       overflow: hidden;
 
       transition:
         transform 5s cubic-bezier(0.12, 0.8, 0.18, 1);
     }
 
-    /* 各マス */
+
+    /* =========================
+       各マス
+       ========================= */
+
     .slice {
       position: absolute;
 
@@ -57,45 +74,26 @@
 
       box-sizing: border-box;
 
-      border-right: 1px solid rgba(255,255,255,0.7);
-      border-bottom: 1px solid rgba(255,255,255,0.7);
+      border-right:
+        1px solid rgba(255,255,255,0.7);
+
+      border-bottom:
+        1px solid rgba(255,255,255,0.7);
     }
 
-    /* ポイント文字 */
-    .label {
-      position: absolute;
 
-      left: 50%;
-      top: 50%;
+    /* =========================
+       中央のGO
+       ========================= */
 
-      width: 150px;
-      height: 30px;
-
-      margin-left: -75px;
-      margin-top: -15px;
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      color: white;
-      font-size: 13px;
-      font-weight: bold;
-
-      text-shadow:
-        1px 1px 2px rgba(0,0,0,0.7);
-
-      pointer-events: none;
-    }
-
-    /* 中央のGO */
     #center {
       position: absolute;
 
       left: 50%;
       top: 50%;
 
-      transform: translate(-50%, -50%);
+      transform:
+        translate(-50%, -50%);
 
       width: 70px;
       height: 70px;
@@ -103,19 +101,26 @@
       background: white;
 
       border: 5px solid #333;
+
       border-radius: 50%;
 
       z-index: 10;
 
       display: flex;
+
       align-items: center;
       justify-content: center;
 
       font-size: 20px;
+
       font-weight: bold;
     }
 
-    /* 上の矢印 */
+
+    /* =========================
+       上の矢印
+       ========================= */
+
     #pointer {
       position: absolute;
 
@@ -124,65 +129,98 @@
       top: -18px;
       left: 50%;
 
-      transform: translateX(-50%);
+      transform:
+        translateX(-50%);
 
       width: 0;
       height: 0;
 
-      border-left: 18px solid transparent;
-      border-right: 18px solid transparent;
-      border-top: 40px solid #e53935;
+      border-left:
+        18px solid transparent;
+
+      border-right:
+        18px solid transparent;
+
+      border-top:
+        40px solid #e53935;
 
       filter:
-        drop-shadow(0 2px 2px rgba(0,0,0,0.3));
+        drop-shadow(
+          0 2px 2px rgba(0,0,0,0.3)
+        );
     }
 
-    /* ボタン */
+
+    /* =========================
+       ボタン
+       ========================= */
+
     #startBtn {
       font-size: 22px;
+
       font-weight: bold;
 
       padding: 14px 45px;
 
       border: none;
+
       border-radius: 12px;
 
       background: #ff9800;
+
       color: white;
 
       cursor: pointer;
 
-      box-shadow: 0 4px 0 #d17c00;
+      box-shadow:
+        0 4px 0 #d17c00;
     }
+
 
     #startBtn:hover {
       background: #ffa726;
     }
 
+
     #startBtn:active {
-      transform: translateY(3px);
-      box-shadow: 0 1px 0 #d17c00;
+      transform:
+        translateY(3px);
+
+      box-shadow:
+        0 1px 0 #d17c00;
     }
+
 
     #startBtn:disabled {
       background: #aaa;
+
       box-shadow: none;
+
       cursor: not-allowed;
     }
 
-    /* 結果 */
+
+    /* =========================
+       結果
+       ========================= */
+
     #result {
       margin-top: 30px;
 
       min-height: 60px;
 
       font-size: 36px;
+
       font-weight: bold;
 
       color: #333;
     }
 
-    /* スマホ */
+
+    /* =========================
+       スマホ対応
+       ========================= */
+
     @media (max-width: 430px) {
 
       #rouletteWrap {
@@ -195,19 +233,17 @@
         height: 300px;
       }
 
-      .label {
-        font-size: 10px;
-      }
-
       #result {
         font-size: 30px;
       }
     }
+
   </style>
 </head>
 
 
 <body>
+
 
   <h1>🎯 ポイントルーレット 🎯</h1>
 
@@ -217,8 +253,10 @@
     <!-- 矢印 -->
     <div id="pointer"></div>
 
+
     <!-- ルーレット -->
     <div id="roulette"></div>
+
 
     <!-- 中央 -->
     <div id="center">
@@ -242,14 +280,25 @@
      * ========================================
      * ポイントとマスの数
      * ========================================
+     *
+     * 合計40マス
+     *
+     * 0pt  → 5マス
+     * 1pt  → 9マス
+     * 2pt  → 8マス
+     * 3pt  → 6マス
+     * 5pt  → 5マス
+     * 10pt → 4マス
+     * 20pt → 2マス
+     * 30pt → 1マス
      */
 
     const points = [
       { point: 0,  count: 5 },
-      { point: 1,  count: 9 },
-      { point: 2,  count: 8 },
-      { point: 3,  count: 6 },
-      { point: 5,  count: 5 },
+      { point: 1, count: 9 },
+      { point: 2, count: 8 },
+      { point: 3, count: 6 },
+      { point: 5, count: 5 },
       { point: 10, count: 4 },
       { point: 20, count: 2 },
       { point: 30, count: 1 }
@@ -277,28 +326,62 @@
 
 
     /*
-     * 40マスを作る
+     * ========================================
+     * ポイントの40マスを作る
+     * ========================================
      */
 
-    const slots = [];
+    function createSlots() {
 
-    points.forEach(item => {
+      const slots = [];
 
-      for (let i = 0; i < item.count; i++) {
-        slots.push(item.point);
+      points.forEach(item => {
+
+        for (let i = 0; i < item.count; i++) {
+
+          slots.push(item.point);
+
+        }
+
+      });
+
+      return slots;
+    }
+
+
+    /*
+     * ========================================
+     * 配列をランダムにシャッフル
+     * ========================================
+     */
+
+    function shuffle(array) {
+
+      const shuffled = [...array];
+
+      for (
+        let i = shuffled.length - 1;
+        i > 0;
+        i--
+      ) {
+
+        const j =
+          Math.floor(
+            Math.random() * (i + 1)
+          );
+
+        [
+          shuffled[i],
+          shuffled[j]
+        ] = [
+          shuffled[j],
+          shuffled[i]
+        ];
+
       }
 
-    });
-
-
-    const roulette =
-      document.getElementById("roulette");
-
-    const total =
-      slots.length;
-
-    const angle =
-      360 / total;
+      return shuffled;
+    }
 
 
     /*
@@ -307,85 +390,102 @@
      * ========================================
      */
 
-    slots.forEach((point, index) => {
+    const roulette =
+      document.getElementById("roulette");
+
+
+    /*
+     * 最初の40マスを作成
+     */
+
+    let slots =
+      shuffle(createSlots());
+
+
+    const total =
+      slots.length;
+
+
+    const angle =
+      360 / total;
+
+
+    /*
+     * ========================================
+     * ルーレットの描画
+     * ========================================
+     */
+
+    function drawRoulette() {
 
       /*
-       * ----------------------------
-       * マス
-       * ----------------------------
+       * いったん全部削除
        */
 
-      const slice =
-        document.createElement("div");
-
-      slice.className =
-        "slice";
+      roulette.innerHTML = "";
 
 
       /*
-       * ポイントによって色を変更
+       * 40マスを作成
        */
 
-      slice.style.backgroundColor =
-        pointColors[point];
+      slots.forEach((point, index) => {
+
+        const slice =
+          document.createElement("div");
 
 
-      /*
-       * 30ptだけ金色を少し豪華にする
-       */
+        slice.className =
+          "slice";
 
-      if (point === 30) {
+
+        /*
+         * ポイントに対応した色
+         */
 
         slice.style.background =
-          "linear-gradient(135deg, #fff4a3, #ffd700, #d4af37, #fff4a3)";
-
-      }
+          pointColors[point];
 
 
-      /*
-       * マスを配置
-       */
+        /*
+         * 30ptだけ金色を豪華にする
+         */
 
-      slice.style.transform =
-        `rotate(${index * angle}deg)
-         skewY(${90 - angle}deg)`;
+        if (point === 30) {
 
+          slice.style.background =
+            "linear-gradient(" +
+            "135deg, " +
+            "#fff4a3, " +
+            "#ffd700, " +
+            "#d4af37, " +
+            "#fff4a3" +
+            ")";
 
-      roulette.appendChild(slice);
-
-
-      /*
-       * ----------------------------
-       * ポイント文字
-       * ----------------------------
-       */
-
-      const label =
-        document.createElement("div");
-
-      label.className =
-        "label";
-
-      label.textContent =
-        point + "pt";
+        }
 
 
-      /*
-       * 文字の位置
-       */
+        /*
+         * マスを配置
+         */
 
-      const textAngle =
-        index * angle + angle / 2;
-
-
-      label.style.transform =
-        `rotate(${textAngle}deg)
-         translateY(-115px)`;
+        slice.style.transform =
+          `rotate(${index * angle}deg)
+           skewY(${90 - angle}deg)`;
 
 
-      roulette.appendChild(label);
+        roulette.appendChild(slice);
 
-    });
+      });
+
+    }
+
+
+    /*
+     * 最初のルーレットを表示
+     */
+
+    drawRoulette();
 
 
     /*
@@ -397,9 +497,14 @@
     const startBtn =
       document.getElementById("startBtn");
 
+
     const result =
       document.getElementById("result");
 
+
+    /*
+     * 現在の回転角度
+     */
 
     let currentRotation = 0;
 
@@ -407,7 +512,7 @@
     startBtn.addEventListener("click", () => {
 
       /*
-       * ボタン連打防止
+       * ボタンを無効化
        */
 
       startBtn.disabled = true;
@@ -421,15 +526,36 @@
 
 
       /*
-       * 止まる場所をランダムに決定
+       * ====================================
+       * ポイント配置をランダムに変更
+       * ====================================
        */
 
-      const selectedIndex =
-        Math.floor(Math.random() * total);
+      slots =
+        shuffle(createSlots());
 
 
       /*
-       * 選択したマスの角度
+       * 新しい配置でルーレットを描画
+       */
+
+      drawRoulette();
+
+
+      /*
+       * ====================================
+       * 止まる場所をランダムに決める
+       * ====================================
+       */
+
+      const selectedIndex =
+        Math.floor(
+          Math.random() * total
+        );
+
+
+      /*
+       * 選択したマスの中央角度
        */
 
       const targetAngle =
@@ -438,7 +564,9 @@
 
 
       /*
-       * 6回転
+       * ====================================
+       * 6回転させる
+       * ====================================
        */
 
       const extraRotation =
@@ -446,8 +574,10 @@
 
 
       /*
+       * ====================================
        * 選択したマスを
-       * 上の矢印へ合わせる
+       * 矢印の位置に合わせる
+       * ====================================
        */
 
       currentRotation +=
@@ -464,17 +594,24 @@
 
 
       /*
-       * 5秒後に結果表示
+       * ====================================
+       * 5秒後に結果を表示
+       * ====================================
        */
 
       setTimeout(() => {
+
+        /*
+         * 実際に矢印が指している
+         * マスのポイント
+         */
 
         const selectedPoint =
           slots[selectedIndex];
 
 
         /*
-         * 結果
+         * 結果表示
          */
 
         result.textContent =
@@ -482,7 +619,7 @@
 
 
         /*
-         * ボタンを再び有効化
+         * ボタンを再び押せるようにする
          */
 
         startBtn.disabled = false;
