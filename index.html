@@ -7,11 +7,16 @@
   <title>ポイントルーレット</title>
 
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       font-family: sans-serif;
       text-align: center;
       padding: 30px 15px;
       background: #f7f7f7;
+      margin: 0;
     }
 
     h1 {
@@ -19,7 +24,10 @@
       margin-bottom: 25px;
     }
 
-    /* ルーレット全体 */
+    /* =========================
+       ルーレット全体
+       ========================= */
+
     #rouletteWrap {
       position: relative;
       width: 360px;
@@ -27,89 +35,77 @@
       margin: 0 auto 25px;
     }
 
-    /* ルーレット */
+    /* =========================
+       ルーレット本体
+       ========================= */
+
     #roulette {
       width: 360px;
       height: 360px;
+
       border-radius: 50%;
       border: 8px solid #333;
-      box-sizing: border-box;
 
       position: relative;
-      overflow: hidden;
 
-      transition: transform 5s cubic-bezier(0.12, 0.8, 0.18, 1);
+      /*
+       * 40マスを作る
+       * JavaScriptで背景を設定
+       */
+
+      transition:
+        transform 5s cubic-bezier(0.12, 0.8, 0.18, 1);
+
+      overflow: hidden;
     }
 
-    /* マス */
-    .slice {
+    /* =========================
+       各マスの文字
+       ========================= */
+
+    .label {
       position: absolute;
-      width: 50%;
-      height: 50%;
+
       left: 50%;
       top: 50%;
+
+      width: 50%;
+      height: 50%;
 
       transform-origin: 0% 0%;
 
+      pointer-events: none;
+
       display: flex;
       justify-content: center;
       align-items: center;
 
-      color: white;
+      font-size: 12px;
       font-weight: bold;
-      font-size: 13px;
 
-      box-sizing: border-box;
-      border-right: 1px solid rgba(255,255,255,0.5);
-      border-bottom: 1px solid rgba(255,255,255,0.5);
+      z-index: 2;
     }
 
-    /* ポイントごとの文字色 */
-    .point-0 {
-      color: white;
+    .label span {
+      display: block;
+
+      /*
+       * 文字をマスの中央付近に配置
+       */
+      transform:
+        translate(25%, 25%)
+        rotate(4.5deg);
+
+      white-space: nowrap;
     }
 
-    .point-1,
-    .point-2,
-    .point-3,
-    .point-5 {
-      color: #333;
-    }
+    /* =========================
+       上の矢印
+       ========================= */
 
-    .point-10,
-    .point-20,
-    .point-30 {
-      color: white;
-    }
-
-    /* 中央の丸 */
-    #center {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-
-      transform: translate(-50%, -50%);
-
-      width: 70px;
-      height: 70px;
-
-      background: white;
-      border: 5px solid #333;
-      border-radius: 50%;
-
-      z-index: 10;
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      font-size: 20px;
-      font-weight: bold;
-    }
-
-    /* 上の矢印 */
     #pointer {
       position: absolute;
+
       z-index: 20;
 
       top: -18px;
@@ -124,10 +120,45 @@
       border-right: 18px solid transparent;
       border-top: 40px solid #e53935;
 
-      filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3));
+      filter:
+        drop-shadow(0 2px 2px rgba(0,0,0,0.3));
     }
 
-    /* ボタン */
+    /* =========================
+       中央
+       ========================= */
+
+    #center {
+      position: absolute;
+
+      left: 50%;
+      top: 50%;
+
+      transform:
+        translate(-50%, -50%);
+
+      width: 70px;
+      height: 70px;
+
+      background: white;
+
+      border: 5px solid #333;
+      border-radius: 50%;
+
+      z-index: 10;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    /* =========================
+       ボタン
+       ========================= */
+
     #startBtn {
       font-size: 22px;
       font-weight: bold;
@@ -143,6 +174,8 @@
       cursor: pointer;
 
       box-shadow: 0 4px 0 #d17c00;
+
+      transition: 0.15s;
     }
 
     #startBtn:hover {
@@ -160,53 +193,59 @@
       cursor: not-allowed;
     }
 
-    /* 結果 */
+    /* =========================
+       結果
+       ========================= */
+
     #result {
       margin-top: 30px;
+
       min-height: 70px;
 
       font-size: 36px;
       font-weight: bold;
 
       color: #333;
-
-      transition: color 0.3s;
     }
 
-    /* 結果のポイント色 */
-    #result.result-0 {
-      color: #000000;
+    /* 結果の色 */
+
+    .result-0 {
+      color: #000;
     }
 
-    #result.result-1 {
+    .result-1 {
       color: #29b6f6;
     }
 
-    #result.result-2 {
+    .result-2 {
       color: #43a047;
     }
 
-    #result.result-3 {
+    .result-3 {
       color: #fbc02d;
     }
 
-    #result.result-5 {
+    .result-5 {
       color: #fb8c00;
     }
 
-    #result.result-10 {
+    .result-10 {
       color: #e53935;
     }
 
-    #result.result-20 {
+    .result-20 {
       color: #8e24aa;
     }
 
-    #result.result-30 {
+    .result-30 {
       color: #d4a017;
     }
 
-    /* 小さい画面対応 */
+    /* =========================
+       小さい画面
+       ========================= */
+
     @media (max-width: 430px) {
 
       #rouletteWrap {
@@ -219,14 +258,15 @@
         height: 300px;
       }
 
-      .slice {
-        font-size: 10px;
+      .label {
+        font-size: 9px;
       }
 
       #result {
         font-size: 30px;
       }
     }
+
   </style>
 </head>
 
@@ -234,6 +274,7 @@
 <body>
 
   <h1>🎯 ポイントルーレット 🎯</h1>
+
 
   <div id="rouletteWrap">
 
@@ -262,40 +303,90 @@
   <script>
 
     /*
-     * ============================
-     * ポイントの設定
-     * ============================
+     * =====================================================
+     * ポイント設定
+     * =====================================================
      *
+     * point = ポイント
      * count = そのポイントのマス数
+     * color = そのポイントの色
+     *
+     * 合計40マス
      */
 
-    const points = [
-      { point: 0,  count: 5, color: "#000000" }, // 黒
-      { point: 1,  count: 9, color: "#29b6f6" }, // 水色
-      { point: 2,  count: 8, color: "#43a047" }, // 緑
-      { point: 3,  count: 6, color: "#fbc02d" }, // 黄色
-      { point: 5,  count: 5, color: "#fb8c00" }, // オレンジ
-      { point: 10, count: 4, color: "#e53935" }, // 赤
-      { point: 20, count: 2, color: "#8e24aa" }, // 紫
-      { point: 30, count: 1, color: "#d4a017" }  // 金
+    const pointSettings = [
+      {
+        point: 0,
+        count: 5,
+        color: "#000000"
+      },
+
+      {
+        point: 1,
+        count: 9,
+        color: "#29b6f6"
+      },
+
+      {
+        point: 2,
+        count: 8,
+        color: "#43a047"
+      },
+
+      {
+        point: 3,
+        count: 6,
+        color: "#fbc02d"
+      },
+
+      {
+        point: 5,
+        count: 5,
+        color: "#fb8c00"
+      },
+
+      {
+        point: 10,
+        count: 4,
+        color: "#e53935"
+      },
+
+      {
+        point: 20,
+        count: 2,
+        color: "#8e24aa"
+      },
+
+      {
+        point: 30,
+        count: 1,
+        color: "#d4a017"
+      }
     ];
 
 
     /*
-     * ============================
+     * =====================================================
      * 40マスを作る
-     * ============================
+     * =====================================================
+     *
+     * ここで
+     *
+     * 「この色のマス = このポイント」
+     *
+     * という関係を作っています。
      */
 
     const slots = [];
 
-    points.forEach(item => {
 
-      for (let i = 0; i < item.count; i++) {
+    pointSettings.forEach(setting => {
+
+      for (let i = 0; i < setting.count; i++) {
 
         slots.push({
-          point: item.point,
-          color: item.color
+          point: setting.point,
+          color: setting.color
         });
 
       }
@@ -304,79 +395,166 @@
 
 
     /*
-     * ============================
+     * 念のため40マスかチェック
+     */
+
+    console.log("マス数:", slots.length);
+
+
+    /*
+     * =====================================================
      * ルーレットを作る
-     * ============================
+     * =====================================================
      */
 
     const roulette =
       document.getElementById("roulette");
 
-    const total = slots.length;
+
+    const total =
+      slots.length;
+
+
+    /*
+     * 1マスの角度
+     *
+     * 360 ÷ 40 = 9度
+     */
+
+    const angle =
+      360 / total;
+
+
+    /*
+     * =====================================================
+     * conic-gradientで40マスを描く
+     * =====================================================
+     *
+     * 各マスの色をそのまま使います。
+     *
+     * これによって、
+     *
+     * 「表示されている色」
+     *
+     * と
+     *
+     * 「slotsのポイント」
+     *
+     * が完全に同じ順番になります。
+     */
+
+    let gradientParts = [];
 
 
     slots.forEach((slot, index) => {
 
-      const slice =
+      const start =
+        index * angle;
+
+      const end =
+        (index + 1) * angle;
+
+
+      gradientParts.push(
+        `${slot.color} ${start}deg ${end}deg`
+      );
+
+    });
+
+
+    roulette.style.background =
+      `conic-gradient(from -90deg, ${gradientParts.join(",")})`;
+
+
+    /*
+     * =====================================================
+     * マスの境界線
+     * =====================================================
+     */
+
+    slots.forEach((slot, index) => {
+
+      const label =
         document.createElement("div");
 
-      slice.className = "slice point-" + slot.point;
-
-      /*
-       * 1マスあたりの角度
-       */
-
-      const angle = 360 / total;
+      label.className = "label";
 
 
       /*
-       * マスを配置
+       * マスの位置
        */
 
-      slice.style.transform =
+      label.style.transform =
         `rotate(${index * angle}deg) skewY(${90 - angle}deg)`;
 
 
       /*
-       * ポイントごとの色
+       * 文字
        */
 
-      slice.style.backgroundColor =
-        slot.color;
+      const span =
+        document.createElement("span");
 
 
-      /*
-       * ポイント表示
-       */
-
-      slice.textContent =
+      span.textContent =
         slot.point + "pt";
 
 
-      roulette.appendChild(slice);
+      /*
+       * 黒・濃い色の背景では白文字
+       * 黄色では黒文字
+       */
+
+      if (
+        slot.point === 3 ||
+        slot.point === 2 ||
+        slot.point === 1 ||
+        slot.point === 5
+      ) {
+        span.style.color = "#222";
+      } else {
+        span.style.color = "#fff";
+      }
+
+
+      label.appendChild(span);
+
+      roulette.appendChild(label);
 
     });
 
 
     /*
-     * ============================
-     * ルーレットを回す
-     * ============================
+     * =====================================================
+     * ボタン・結果
+     * =====================================================
      */
 
     const startBtn =
       document.getElementById("startBtn");
 
+
     const result =
       document.getElementById("result");
+
+
+    /*
+     * 現在のルーレット回転角度
+     */
 
     let currentRotation = 0;
 
 
+    /*
+     * =====================================================
+     * ルーレットを回す
+     * =====================================================
+     */
+
     startBtn.addEventListener("click", () => {
 
       /*
-       * ボタンを無効化
+       * ボタンを押せなくする
        */
 
       startBtn.disabled = true;
@@ -387,12 +565,13 @@
        */
 
       result.textContent = "";
-
       result.className = "";
 
 
       /*
-       * どのマスに止まるか決める
+       * =================================================
+       * 今回止めたいマスをランダムに決める
+       * =================================================
        */
 
       const selectedIndex =
@@ -400,15 +579,9 @@
 
 
       /*
-       * 1マスの角度
-       */
-
-      const angle = 360 / total;
-
-
-      /*
-       * 選んだマスの中央を
-       * 上の矢印に合わせる
+       * =================================================
+       * 選んだマスの中央角度
+       * =================================================
        */
 
       const targetAngle =
@@ -416,7 +589,9 @@
 
 
       /*
-       * 数回転させる
+       * =================================================
+       * 6回転させる
+       * =================================================
        */
 
       const extraRotation =
@@ -424,7 +599,10 @@
 
 
       /*
-       * 最終的な回転角度
+       * =================================================
+       * 矢印は上（-90度）にあるので、
+       * 選んだマスの中央が上に来るように回す。
+       * =================================================
        */
 
       currentRotation +=
@@ -433,7 +611,7 @@
 
 
       /*
-       * 回転開始
+       * 回転
        */
 
       roulette.style.transform =
@@ -441,13 +619,30 @@
 
 
       /*
-       * 5秒後に結果表示
+       * =================================================
+       * 回転終了
+       * =================================================
        */
 
       setTimeout(() => {
 
         /*
-         * 選ばれたマスの情報を取得
+         * =================================================
+         * ここが重要
+         * =================================================
+         *
+         * 実際に矢印が指しているマスのデータを
+         * slotsから取得します。
+         *
+         * そのため、
+         *
+         * 「矢印の色」
+         *
+         * と
+         *
+         * 「結果のポイント」
+         *
+         * が必ず同じになります。
          */
 
         const selectedSlot =
@@ -458,8 +653,30 @@
           selectedSlot.point;
 
 
+        const selectedColor =
+          selectedSlot.color;
+
+
+        console.log(
+          "選択されたマス:",
+          selectedIndex
+        );
+
+        console.log(
+          "色:",
+          selectedColor
+        );
+
+        console.log(
+          "ポイント:",
+          selectedPoint
+        );
+
+
         /*
-         * 結果のポイントと色を連動
+         * =================================================
+         * 結果表示
+         * =================================================
          */
 
         result.className =
@@ -471,10 +688,11 @@
 
 
         /*
-         * ボタンを再び有効化
+         * ボタンを再び押せるようにする
          */
 
         startBtn.disabled = false;
+
 
       }, 5000);
 
