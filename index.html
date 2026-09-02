@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>運命のルーレット</title>
+  <title>ポイントルーレット</title>
 
   <style>
     body {
@@ -209,7 +209,7 @@
 
 <body>
 
-  <h1>🎯 運命のルーレット 🎯</h1>
+  <h1>🎯 ポイントルーレット 🎯</h1>
 
 
   <div id="rouletteWrap">
@@ -257,6 +257,26 @@
 
 
     /*
+     * ========================================
+     * ポイントごとの色
+     * ========================================
+     */
+
+    const pointColors = {
+
+      0: "#111111",       // 黒
+      1: "#4FC3F7",       // 水色
+      2: "#F48FB1",       // ピンク
+      3: "#FFD54F",       // 黄色
+      5: "#4CAF50",       // 緑
+      10: "#EF5350",      // 赤
+      20: "#C0C0C0",      // 銀色
+      30: "#FFD700"       // 金色
+
+    };
+
+
+    /*
      * 40マスを作る
      */
 
@@ -271,28 +291,14 @@
     });
 
 
-    /*
-     * 色
-     */
-
-    const colors = [
-      "#42a5f5",
-      "#66bb6a",
-      "#ffa726",
-      "#ab47bc",
-      "#ef5350",
-      "#26a69a",
-      "#ec407a",
-      "#7e57c2"
-    ];
-
-
     const roulette =
       document.getElementById("roulette");
 
-    const total = slots.length;
+    const total =
+      slots.length;
 
-    const angle = 360 / total;
+    const angle =
+      360 / total;
 
 
     /*
@@ -305,21 +311,45 @@
 
       /*
        * ----------------------------
-       * 色のマス
+       * マス
        * ----------------------------
        */
 
       const slice =
         document.createElement("div");
 
-      slice.className = "slice";
+      slice.className =
+        "slice";
+
+
+      /*
+       * ポイントによって色を変更
+       */
 
       slice.style.backgroundColor =
-        colors[index % colors.length];
+        pointColors[point];
+
+
+      /*
+       * 30ptだけ金色を少し豪華にする
+       */
+
+      if (point === 30) {
+
+        slice.style.background =
+          "linear-gradient(135deg, #fff4a3, #ffd700, #d4af37, #fff4a3)";
+
+      }
+
+
+      /*
+       * マスを配置
+       */
 
       slice.style.transform =
         `rotate(${index * angle}deg)
          skewY(${90 - angle}deg)`;
+
 
       roulette.appendChild(slice);
 
@@ -333,17 +363,15 @@
       const label =
         document.createElement("div");
 
-      label.className = "label";
+      label.className =
+        "label";
 
       label.textContent =
         point + "pt";
 
 
       /*
-       * 文字をマスの中央付近へ配置
-       *
-       * index * angle
-       * で各マスの方向へ回転
+       * 文字の位置
        */
 
       const textAngle =
@@ -353,19 +381,6 @@
       label.style.transform =
         `rotate(${textAngle}deg)
          translateY(-115px)`;
-
-
-      /*
-       * 文字自体は水平に戻す
-       *
-       * これによって
-       * 回転中でもポイントが読みやすい
-       */
-
-      label.style.setProperty(
-        "--angle",
-        `${textAngle}deg`
-      );
 
 
       roulette.appendChild(label);
@@ -406,7 +421,7 @@
 
 
       /*
-       * ランダムに止めるマスを決定
+       * 止まる場所をランダムに決定
        */
 
       const selectedIndex =
@@ -414,7 +429,7 @@
 
 
       /*
-       * 選択されたマスの中心角度
+       * 選択したマスの角度
        */
 
       const targetAngle =
@@ -423,7 +438,7 @@
 
 
       /*
-       * 6回転する
+       * 6回転
        */
 
       const extraRotation =
@@ -431,8 +446,8 @@
 
 
       /*
-       * 矢印の位置に
-       * 選択したマスを合わせる
+       * 選択したマスを
+       * 上の矢印へ合わせる
        */
 
       currentRotation +=
@@ -449,8 +464,7 @@
 
 
       /*
-       * 5秒後
-       * 回転終了
+       * 5秒後に結果表示
        */
 
       setTimeout(() => {
@@ -460,7 +474,7 @@
 
 
         /*
-         * 結果表示
+         * 結果
          */
 
         result.textContent =
@@ -468,7 +482,7 @@
 
 
         /*
-         * ボタン復活
+         * ボタンを再び有効化
          */
 
         startBtn.disabled = false;
