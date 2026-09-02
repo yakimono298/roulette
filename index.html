@@ -1,1 +1,428 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>ポイントルーレット</title>
+
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding: 30px 15px;
+      background: #f7f7f7;
+    }
+
+    h1 {
+      font-size: 32px;
+      margin-bottom: 25px;
+    }
+
+    /* ルーレット全体 */
+    #rouletteWrap {
+      position: relative;
+      width: 360px;
+      height: 360px;
+      margin: 0 auto 25px;
+    }
+
+    /* ルーレット */
+    #roulette {
+      width: 360px;
+      height: 360px;
+      border-radius: 50%;
+      border: 8px solid #333;
+      box-sizing: border-box;
+
+      position: relative;
+      overflow: hidden;
+
+      transition: transform 5s cubic-bezier(0.12, 0.8, 0.18, 1);
+    }
+
+    /* マス */
+    .slice {
+      position: absolute;
+      width: 50%;
+      height: 50%;
+      left: 50%;
+      top: 50%;
+
+      transform-origin: 0% 0%;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      color: white;
+      font-weight: bold;
+      font-size: 13px;
+
+      box-sizing: border-box;
+      border-right: 1px solid rgba(255,255,255,0.5);
+      border-bottom: 1px solid rgba(255,255,255,0.5);
+    }
+
+    /* 中央の丸 */
+    #center {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+
+      transform: translate(-50%, -50%);
+
+      width: 70px;
+      height: 70px;
+
+      background: white;
+      border: 5px solid #333;
+      border-radius: 50%;
+
+      z-index: 10;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    /* 上の矢印 */
+    #pointer {
+      position: absolute;
+      z-index: 20;
+
+      top: -18px;
+      left: 50%;
+
+      transform: translateX(-50%);
+
+      width: 0;
+      height: 0;
+
+      border-left: 18px solid transparent;
+      border-right: 18px solid transparent;
+      border-top: 40px solid #e53935;
+
+      filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3));
+    }
+
+    /* ボタン */
+    #startBtn {
+      font-size: 22px;
+      font-weight: bold;
+
+      padding: 14px 45px;
+
+      border: none;
+      border-radius: 12px;
+
+      background: #ff9800;
+      color: white;
+
+      cursor: pointer;
+
+      box-shadow: 0 4px 0 #d17c00;
+    }
+
+    #startBtn:hover {
+      background: #ffa726;
+    }
+
+    #startBtn:active {
+      transform: translateY(3px);
+      box-shadow: 0 1px 0 #d17c00;
+    }
+
+    #startBtn:disabled {
+      background: #aaa;
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+
+    /* 結果 */
+    #result {
+      margin-top: 30px;
+
+      min-height: 60px;
+
+      font-size: 36px;
+      font-weight: bold;
+
+      color: #333;
+    }
+
+    /* 小さい画面対応 */
+    @media (max-width: 430px) {
+
+      #rouletteWrap {
+        width: 300px;
+        height: 300px;
+      }
+
+      #roulette {
+        width: 300px;
+        height: 300px;
+      }
+
+      .slice {
+        font-size: 10px;
+      }
+
+      #result {
+        font-size: 30px;
+      }
+    }
+  </style>
+</head>
+
+
+<body>
+
+  <h1>🎯 ポイントルーレット 🎯</h1>
+
+  <div id="rouletteWrap">
+
+    <!-- 矢印 -->
+    <div id="pointer"></div>
+
+    <!-- ルーレット -->
+    <div id="roulette"></div>
+
+    <!-- 中央 -->
+    <div id="center">
+      GO!
+    </div>
+
+  </div>
+
+
+  <button id="startBtn">
+    ルーレットを回す！
+  </button>
+
+
+  <div id="result"></div>
+
+
+  <script>
+
+    /*
+     * ============================
+     * ポイントの設定
+     * ============================
+     *
+     * 数字をそのまま「マスの数」として使用します。
+     *
+     * 0pt  → 5マス
+     * 1pt  → 9マス
+     * 2pt  → 8マス
+     * 3pt  → 6マス
+     * 5pt  → 5マス
+     * 10pt → 4マス
+     * 20pt → 2マス
+     * 30pt → 1マス
+     */
+
+    const points = [
+      { point: 0,  count: 5 },
+      { point: 1,  count: 9 },
+      { point: 2,  count: 8 },
+      { point: 3,  count: 6 },
+      { point: 5,  count: 5 },
+      { point: 10, count: 4 },
+      { point: 20, count: 2 },
+      { point: 30, count: 1 }
+    ];
+
+
+    /*
+     * ============================
+     * 40マスを作る
+     * ============================
+     */
+
+    const slots = [];
+
+    points.forEach(item => {
+
+      for (let i = 0; i < item.count; i++) {
+        slots.push(item.point);
+      }
+
+    });
+
+
+    /*
+     * 色
+     */
+
+    const colors = [
+      "#42a5f5",
+      "#66bb6a",
+      "#ffa726",
+      "#ab47bc",
+      "#ef5350",
+      "#26a69a",
+      "#ec407a",
+      "#7e57c2"
+    ];
+
+
+    /*
+     * ルーレットを作る
+     */
+
+    const roulette = document.getElementById("roulette");
+
+    const total = slots.length;
+
+
+    slots.forEach((point, index) => {
+
+      const slice = document.createElement("div");
+
+      slice.className = "slice";
+
+      /*
+       * 1マスあたりの角度
+       */
+
+      const angle = 360 / total;
+
+      /*
+       * マスを配置
+       */
+
+      slice.style.transform =
+        `rotate(${index * angle}deg) skewY(${90 - angle}deg)`;
+
+
+      /*
+       * 色
+       */
+
+      slice.style.backgroundColor =
+        colors[index % colors.length];
+
+
+      /*
+       * ポイント表示
+       */
+
+      slice.textContent = point + "pt";
+
+
+      roulette.appendChild(slice);
+
+    });
+
+
+    /*
+     * ============================
+     * ルーレットを回す
+     * ============================
+     */
+
+    const startBtn = document.getElementById("startBtn");
+    const result = document.getElementById("result");
+
+    let currentRotation = 0;
+
+
+    startBtn.addEventListener("click", () => {
+
+      /*
+       * ボタンを無効化
+       */
+
+      startBtn.disabled = true;
+
+      /*
+       * 結果を消す
+       */
+
+      result.textContent = "";
+
+
+      /*
+       * どのマスに止まるか決める
+       */
+
+      const selectedIndex =
+        Math.floor(Math.random() * total);
+
+
+      /*
+       * 1マスの角度
+       */
+
+      const angle = 360 / total;
+
+
+      /*
+       * 選んだマスを上の矢印に合わせる
+       *
+       * マスの中央が矢印に来るように
+       * 半マス分ずらす。
+       */
+
+      const targetAngle =
+        selectedIndex * angle + angle / 2;
+
+
+      /*
+       * 数回転させてから停止
+       */
+
+      const extraRotation =
+        360 * 6;
+
+
+      /*
+       * 最終的な回転角度
+       */
+
+      currentRotation +=
+        extraRotation + (360 - targetAngle);
+
+
+      /*
+       * 回転開始
+       */
+
+      roulette.style.transform =
+        `rotate(${currentRotation}deg)`;
+
+
+      /*
+       * 回転終了後に結果を表示
+       */
+
+      setTimeout(() => {
+
+        const selectedPoint =
+          slots[selectedIndex];
+
+
+        result.textContent =
+          `🎉 ${selectedPoint} pt！ 🎉`;
+
+
+        /*
+         * ボタンを再び有効化
+         */
+
+        startBtn.disabled = false;
+
+      }, 5000);
+
+    });
+
+  </script>
+
+</body>
+</html>
 
